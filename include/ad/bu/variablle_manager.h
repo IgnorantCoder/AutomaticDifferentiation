@@ -67,4 +67,17 @@ namespace ad { namespace bu {
             = detail::create_mapping(data);
         return variable_manager<V>(std::move(index_mapper));
     }
+
+    /**
+    @brief dispatcher of variable_manager
+    */
+    template<typename V, std::size_t N>
+    variable_manager<V>
+    create_variable_manager(const std::array<V, N>& data)
+    {
+        std::map<V const*, std::size_t>&& index_mapper
+            = detail::create_mapping(data);
+        return variable_manager<V>(std::move(index_mapper));
+    }
+
 } }

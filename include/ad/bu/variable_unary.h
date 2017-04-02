@@ -9,7 +9,7 @@
 namespace ad { namespace bu {
     template <typename E, typename F>
     class variable_unary
-        : public variable_expression<variable_unary<E, F>>{
+        : public variable_expression<variable_unary<E, F>> {
     private:
         using functor_type = F;
         using derivative_functor_type
@@ -21,7 +21,7 @@ namespace ad { namespace bu {
             = decltype(
                 std::declval<value_type>()
                 * std::declval<typename derivative_functor_type::result_type>());
-        using expression_type = variable_unary<E, F>;
+        using closure_type = variable_unary<E, F>;
         using index_map_type = typename E::index_map_type;
 
     public:
@@ -33,7 +33,7 @@ namespace ad { namespace bu {
         const index_map_type& index_mapper() const;
 
     private:
-        typename E::expression_type _e;
+        typename E::closure_type _e;
     };
 
     template<typename E, typename F>
@@ -73,33 +73,29 @@ namespace ad { namespace bu {
             = detail::negate_functor<typename E::value_type>;
         return variable_unary<E, functor_type>(e());
     }
-
-    /**
-    @details \f$sin(x)\f$
-    */
-    template <typename E>
-    inline variable_unary<E, detail::sin_functor<typename E::value_type>>
-    sin(const variable_expression<E>& e)
-    {
-        using functor_type
-            = detail::sin_functor<typename E::value_type>;
-        return variable_unary<E, functor_type>(e());
-    }
-
-    /**
-    @details \f$cos(x)\f$
-    */
-    template <typename E>
-    inline variable_unary<E, detail::cos_functor<typename E::value_type>>
-    cos(const variable_expression<E>& e)
-    {
-        using functor_type
-            = detail::cos_functor<typename E::value_type>;
-        return variable_unary<E, functor_type>(e());
-    }
 }}
 
-namespace std {
-    using ad::bu::sin;
-    using ad::bu::cos;
+#define DEFINE_SPECIFIC_VARIABLE_UNARY(NAME)                                   \
+namespace ad { namespace bu {                                                  \
+    template <typename E>                                                      \
+    inline variable_unary<E, detail::NAME##_functor<typename E::value_type>>   \
+    NAME(const variable_expression<E>& e)                                      \
+    {                                                                          \
+        using functor_type                                                     \
+            = detail::NAME##_functor<typename E::value_type>;                  \
+        return variable_unary<E, functor_type>(e());                           \
+    }                                                                          \
+}}                                                                             \
+namespace std {                                                                \
+    using ad::bu::NAME;                                                        \
 }
+
+DEFINE_SPECIFIC_VARIABLE_UNARY(sqrt);
+DEFINE_SPECIFIC_VARIABLE_UNARY(sin);
+DEFINE_SPECIFIC_VARIABLE_UNARY(cos);
+DEFINE_SPECIFIC_VARIABLE_UNARY(tan);
+DEFINE_SPECIFIC_VARIABLE_UNARY(log);
+DEFINE_SPECIFIC_VARIABLE_UNARY(exp);
+DEFINE_SPECIFIC_VARIABLE_UNARY(erf);
+
+#undef DEFINE_SPECIFIC_VARIABLE_UNARY

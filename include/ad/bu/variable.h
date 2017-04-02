@@ -11,7 +11,7 @@ namespace ad { namespace bu {
     public:
         using value_type = V;
         using derivative_value_type = value_type;
-        using expression_type = const variable<value_type>&;
+        using closure_type = const variable<value_type>&;
         using index_map_type = std::map<value_type const*, std::size_t>;
 
     public:
@@ -23,6 +23,11 @@ namespace ad { namespace bu {
             const value_type& f,
             const std::vector<value_type>& df,
             const index_map_type& index_mapper);
+
+        template <typename E>
+        explicit variable(const variable_expression<E>& x);
+        template <typename E>
+        explicit variable(variable_expression<E>&& x);
 
     public:
         operator value_type() const;
@@ -55,6 +60,18 @@ namespace ad { namespace bu {
         _df(df),
         _index_mapper(index_mapper)
     {
+    }
+
+    template <typename V>
+    template <typename E>
+    inline ad::bu::variable<V>::variable(const variable_expression<E>& x)
+        : _f(static_cast<V>(x())),
+        _df(x().index_mapper().size()),
+        _index_mapper(x().index_mapper())
+    {
+        for (std::size_t i = 0; i < _df.size(); ++i) {
+            _df[i] = x()(i);
+        }
     }
 
     template<typename V>

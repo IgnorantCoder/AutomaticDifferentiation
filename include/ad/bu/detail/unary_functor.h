@@ -12,49 +12,26 @@ namespace ad { namespace bu { namespace detail {
             return -x;
         }
     };
+}}}
 
-    template <typename T>
-    struct sin_functor {
-        using result_type = decltype(std::sin(std::declval<T>()));
-        static result_type apply(const T& x)
-        {
-            return std::sin(x);
-        }
-    };
+#define DEFINE_UNARY_FUNCTOR_FOR_AD_BU(NAME)                                   \
+namespace ad { namespace bu { namespace detail {                               \
+    template <typename T>                                                      \
+    struct NAME##_functor {                                                    \
+        using result_type = decltype(std::NAME(std::declval<T>()));            \
+        static result_type apply(const T& x)                                   \
+        {                                                                      \
+            return std::NAME(x);                                               \
+        }                                                                      \
+    };                                                                         \
+}}} 
 
-    template <typename T>
-    struct cos_functor {
-        using result_type = decltype(std::cos(std::declval<T>()));
-        static result_type apply(const T& x)
-        {
-            return std::cos(x);
-        }
-    };
+DEFINE_UNARY_FUNCTOR_FOR_AD_BU(sin);
+DEFINE_UNARY_FUNCTOR_FOR_AD_BU(cos);
+DEFINE_UNARY_FUNCTOR_FOR_AD_BU(tan);
+DEFINE_UNARY_FUNCTOR_FOR_AD_BU(sqrt);
+DEFINE_UNARY_FUNCTOR_FOR_AD_BU(log);
+DEFINE_UNARY_FUNCTOR_FOR_AD_BU(exp);
+DEFINE_UNARY_FUNCTOR_FOR_AD_BU(erf);
 
-    template <typename T>
-    struct tan_functor {
-        using result_type = decltype(std::tan(std::declval<T>()));
-        static result_type apply(const T& x)
-        {
-            return std::tan(x);
-        }
-    };
-
-    template <typename T>
-    struct log_functor {
-        using result_type = decltype(std::log(std::declval<T>()));
-        static result_type apply(const T& x)
-        {
-            return std::log(x);
-        }
-    };
-
-    template <typename T>
-    struct exp_functor {
-        using result_type = decltype(std::exp(std::declval<T>()));
-        static result_type apply(const T& x)
-        {
-            return std::exp(x);
-        }
-    };
-} } }
+#undef DEFINE_UNARY_FUNCTOR_FOR_AD_BU

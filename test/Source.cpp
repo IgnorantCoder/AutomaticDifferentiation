@@ -1,66 +1,98 @@
+#include <algorithm>
+#include <array>
+#include <cmath>
 #include <functional>
 #include <iostream>
+#include <iterator>
+#include <numeric>
 
 #include "ad/bottom_up.h"
 
-struct const_values {
-    static constexpr double c1 = 2;
-    static constexpr double c2 = -3;
-    static constexpr double c3 = 1;
-};
-
-template <typename T1, typename T2>
-auto f(const T1& x0, const T2& x1)
+template <typename T, typename M, typename S>
+auto normal_distribution_cdf(
+    const T& x,
+    const M& mu,
+    const S& sigma)
 {
-    constexpr double c1 = const_values::c1;
-    constexpr double c2 = const_values::c2;
-    constexpr double c3 = const_values::c3;
-    return ((std::cos(x0) - c1) * std::sin(x1) - (x1 * x1 / c2)) * c3;
+    return 0.5 * (1.0 + std::erf((x - mu) / std::sqrt(2 * sigma * sigma)));
 }
 
-template <typename F>
-auto create_simulator(const F f, const double h)
+template <typename T>
+auto standard_distribution_cdf(const T& x)
 {
-    return [f, h](const double x)
-    {
-        return (f(x + h) - f(x - h)) / (2.0 * h);
-    };
+    return normal_distribution_cdf(x, 0.0, 1.0);
+}
+
+template <typename X, typename T, typename K, typename S, typename R>
+auto calc_d1(const X& x, const T& t, const K& k, const S& s, const R& r)
+{
+    return (std::log(x / k) + (r + s * s * 0.5) * t) / (s * std::sqrt(t));
+}
+
+template <typename X, typename T, typename K, typename S, typename R>
+auto calc_d2(const X& x, const T& t, const K& k, const S& s, const R& r)
+{
+    return (std::log(x / k) + (r - s * s * 0.5) * t) / (s * std::sqrt(t));
+}
+
+/**
+@brief call option price based on black-scholes model.
+*/
+template <typename X, typename T, typename K, typename S, typename R>
+auto call_option(
+    const X& x,
+    const T& t,
+    const K& k,
+    const S& s,
+    const R& r)
+{
+    const auto d1 = ad::bu::eval(calc_d1(x, t, k, s, r));
+    const auto d2 = ad::bu::eval(calc_d2(x, t, k, s, r));
+    const auto d = std::exp(- r * t);
+
+    const auto ret 
+        = x * standard_distribution_cdf(d1)
+        - k * d * standard_distribution_cdf(d2);
+
+    return ad::bu::eval(ret);
 }
 
 int main()
 {
-    const double x0 = 0.5;
-    const double x1 = 1.0;
+    const double x = 107;
+    const double k = 100;
+    const double t = 0.5;
+    const double s = 0.3;
+    const double r = 0.1;
 
-    {
-        const double h = 0.001;
-        const auto sim_dfdx0
-            = create_simulator([x1](const double x) {return f(x, x1);}, h);
-        const auto sim_dfdx1
-            = create_simulator([x0](const double x) {return f(x0, x);}, h);
+    const double h = 0.0001;
+    const double price
+        = call_option(x, t, k, s, r);
+    const double delta
+        = (call_option(x + h, t, k, s, r)
+            - call_option(x - h, t, k, s, r)) / (2 * h);
+    const double theta
+        = (call_option(x, t + h, k, s, r)
+            - call_option(x, t - h, k, s, r)) / (2 * h);
+    const double vega
+        = (call_option(x, t, k, s + h, r)
+            - call_option(x, t, k, s - h, r)) / (2 * h);
 
-        std::cout << f(x0, x1) << std::endl;
-        std::cout << sim_dfdx0(x0) << std::endl;
-        std::cout << sim_dfdx1(x1) << std::endl;
-    }
-    {
-        const auto mgr = ad::bu::create_variable_manager(x0, x1);
-        const auto v0 = mgr.get_variable(x0);
-        const auto v1 = mgr.get_variable(x1);
-        const auto y = f(v0, v1);
-        std::cout << static_cast<double>(y) << std::endl;
-        std::cout << ad::bu::d(y).d(x0) << std::endl;
-        std::cout << ad::bu::d(y).d(x1) << std::endl;
-    }
-    {
-        std::vector<double> v = { x0, x1 };
-        const auto mgr = ad::bu::create_variable_manager(v);
-        const auto v0 = mgr.get_variable(v[0]);
-        const auto v1 = mgr.get_variable(v[1]);
-        const auto y = f(v0, v1);
-        std::cout << static_cast<double>(y) << std::endl;
-        std::cout << ad::bu::d(y).d(v[0]) << std::endl;
-        std::cout << ad::bu::d(y).d(v[1]) << std::endl;
-    }
+    const auto mgr 
+        = ad::bu::create_variable_manager(x, k, t, s, r);
+    const auto p
+        = call_option(
+            mgr.get_variable(x),
+            mgr.get_variable(t),
+            mgr.get_variable(k),
+            mgr.get_variable(s),
+            mgr.get_variable(r));
+
+    std::cout
+        << "price:" << price << "," << static_cast<double>(p) << std::endl
+        << "delta:" << delta << "," << ad::bu::d(p).d(x) << std::endl
+        << "vega:" << vega << "," << ad::bu::d(p).d(s) << std::endl
+        << "theta:" << theta << "," << ad::bu::d(p).d(t) << std::endl;
+
     return 0;
 }

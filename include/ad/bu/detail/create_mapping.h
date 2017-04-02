@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <map>
 #include <memory>
 #include <vector>
@@ -38,6 +39,19 @@ namespace ad { namespace bu { namespace detail {
     template <typename T>
     inline std::map<T const*, std::size_t>
     create_mapping(const std::vector<T>& v)
+    {
+        std::vector<T const*> d;
+        d.reserve(v.size());
+        for (const auto& e : v)
+        {
+            d.emplace_back(std::addressof(e));
+        }
+        return create_mapping(d);
+    }
+
+    template <typename T, std::size_t N>
+    inline std::map<T const*, std::size_t>
+        create_mapping(const std::array<T, N>& v)
     {
         std::vector<T const*> d;
         d.reserve(v.size());
