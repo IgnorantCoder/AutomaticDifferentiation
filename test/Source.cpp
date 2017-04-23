@@ -1,12 +1,10 @@
-#include <algorithm>
-#include <array>
+#include <chrono>
 #include <cmath>
-#include <functional>
 #include <iostream>
-#include <iterator>
-#include <numeric>
+#include <string>
 
 #include "ad/bottom_up.h"
+#include "ad/top_down.h"
 
 template <typename T, typename M, typename S>
 auto normal_distribution_cdf(
@@ -57,42 +55,88 @@ auto call_option(
     return ad::bu::eval(ret);
 }
 
+struct test {
+    static constexpr double x = 107;
+    static constexpr double k = 100;
+    static constexpr double t = 0.5;
+    static constexpr double s = 0.3;
+    static constexpr double r = 0.1;
+
+    static void shock_method(const std::size_t n)
+    {
+        for (std::size_t i = 0; i < n; ++i) {
+            const double h = 0.0001;
+            const double price
+                = call_option(x, t, k, s, r);
+            const double delta
+                = (call_option(x + h, t, k, s, r)
+                    - call_option(x - h, t, k, s, r)) / (2 * h);
+            const double theta
+                = (call_option(x, t + h, k, s, r)
+                    - call_option(x, t - h, k, s, r)) / (2 * h);
+            const double vega
+                = (call_option(x, t, k, s + h, r)
+                    - call_option(x, t, k, s - h, r)) / (2 * h);
+        }
+    }
+
+    static void bottom_up_method(const std::size_t n)
+    {
+        const auto mgr
+            = ad::bu::create_variable_manager(x, k, t, s, r);
+        const auto v_x = mgr.get_variable(x);
+        const auto v_t = mgr.get_variable(t);
+        const auto v_k = mgr.get_variable(k);
+        const auto v_s = mgr.get_variable(s);
+        const auto v_r = mgr.get_variable(r);
+        
+        for (std::size_t i = 0; i < n; ++i) {
+            const auto p
+                = call_option(v_x, v_t, v_k, v_s, v_r);
+            const double price
+                = static_cast<double>(p);
+            const double delta
+                = ad::bu::d(p).d(x);
+            const double theta
+                = ad::bu::d(p).d(t);
+            const double vega
+                = ad::bu::d(p).d(s);
+        }
+    }
+};
+
+template <typename F>
+void run_test(
+    F&& test_method,
+    const std::string& method_name,
+    const std::size_t n)
+{
+    std::cout << "start test of " << method_name << std::endl;
+    {
+        const auto t_s = std::chrono::system_clock::now();
+        test_method(n);
+        const auto t_e = std::chrono::system_clock::now();
+        const auto time
+            = std::chrono::duration_cast<std::chrono::milliseconds>(t_e - t_s).count();
+        std::cout << time << "[ms]" << std::endl;
+    }
+    std::cout << "end test of " << method_name << std::endl;
+}
+
 int main()
 {
+    //test data
     const double x = 107;
     const double k = 100;
     const double t = 0.5;
     const double s = 0.3;
     const double r = 0.1;
 
-    const double h = 0.0001;
-    const double price
-        = call_option(x, t, k, s, r);
-    const double delta
-        = (call_option(x + h, t, k, s, r)
-            - call_option(x - h, t, k, s, r)) / (2 * h);
-    const double theta
-        = (call_option(x, t + h, k, s, r)
-            - call_option(x, t - h, k, s, r)) / (2 * h);
-    const double vega
-        = (call_option(x, t, k, s + h, r)
-            - call_option(x, t, k, s - h, r)) / (2 * h);
+    //test count
+    const std::size_t n = 1000000;
 
-    const auto mgr 
-        = ad::bu::create_variable_manager(x, k, t, s, r);
-    const auto p
-        = call_option(
-            mgr.get_variable(x),
-            mgr.get_variable(t),
-            mgr.get_variable(k),
-            mgr.get_variable(s),
-            mgr.get_variable(r));
-
-    std::cout
-        << "price:" << price << "," << static_cast<double>(p) << std::endl
-        << "delta:" << delta << "," << ad::bu::d(p).d(x) << std::endl
-        << "vega:" << vega << "," << ad::bu::d(p).d(s) << std::endl
-        << "theta:" << theta << "," << ad::bu::d(p).d(t) << std::endl;
+    run_test(test::shock_method, "shock method", n);
+    run_test(test::bottom_up_method, "bottom up method", n);
 
     return 0;
 }
