@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 namespace ad { namespace bu {
     template <typename E>
     class variable_expression {

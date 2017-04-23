@@ -45,10 +45,10 @@ namespace ad { namespace td { namespace detail {
         static vertex_index_type get_start_vertex(const arc_type& arc);
         static vertex_index_type get_end_vertex(const arc_type& arc);
         static weight_type get_vertex_weight(const arc_type& arc);
-        static arc_ref_set& get_arc_set_pointing_to_me(vertex_type& vertex);
-        static arc_ref_set& get_arc_set_originating_from_me(vertex_type& vertex);
-        static const arc_ref_set& get_arc_set_pointing_to_me(const vertex_type& vertex);
-        static const arc_ref_set& get_arc_set_originating_from_me(const vertex_type& vertex);
+        static arc_ref_set& get_arc_set_pointing_to(vertex_type& vertex);
+        static arc_ref_set& get_arc_set_originating_from(vertex_type& vertex);
+        static const arc_ref_set& get_arc_set_pointing_to(const vertex_type& vertex);
+        static const arc_ref_set& get_arc_set_originating_from(const vertex_type& vertex);
 
     public:
         vertex_index_type add_vertex();
@@ -111,30 +111,30 @@ namespace ad { namespace td { namespace detail {
 
     template<typename W>
     inline typename calculation_graph<W>::arc_ref_set&
-    calculation_graph<W>::get_arc_set_pointing_to_me(vertex_type& vertex)
+    calculation_graph<W>::get_arc_set_pointing_to(vertex_type& vertex)
     {
         return vertex.first;
     }
 
     template<typename W>
     inline const typename calculation_graph<W>::arc_ref_set&
-    calculation_graph<W>::get_arc_set_pointing_to_me(const vertex_type& vertex)
+    calculation_graph<W>::get_arc_set_pointing_to(const vertex_type& vertex)
     {
-        return get_arc_set_pointing_to_me(*const_cast<vertex_type*>(&vertex));
+        return get_arc_set_pointing_to(*const_cast<vertex_type*>(&vertex));
     }
 
     template<typename W>
     inline typename calculation_graph<W>::arc_ref_set&
-    calculation_graph<W>::get_arc_set_originating_from_me(vertex_type& vertex)
+    calculation_graph<W>::get_arc_set_originating_from(vertex_type& vertex)
     {
         return vertex.second;
     }
 
     template<typename W>
     inline const typename calculation_graph<W>::arc_ref_set&
-    calculation_graph<W>::get_arc_set_originating_from_me(const vertex_type& vertex)
+    calculation_graph<W>::get_arc_set_originating_from(const vertex_type& vertex)
     {
-        return get_arc_set_originating_from_me(*const_cast<vertex_type*>(&vertex));
+        return get_arc_set_originating_from(*const_cast<vertex_type*>(&vertex));
     }
 
     template<typename W>
@@ -171,8 +171,8 @@ namespace ad { namespace td { namespace detail {
         const auto it = this->_arc_set.emplace(from, to, w);
         const auto arc_ref = std::cref(*it.first);
 
-        get_arc_set_originating_from_me(this->_vertex_set[from]).insert(arc_ref);
-        get_arc_set_pointing_to_me(this->_vertex_set[to]).insert(arc_ref);
+        get_arc_set_originating_from(this->_vertex_set[from]).insert(arc_ref);
+        get_arc_set_pointing_to(this->_vertex_set[to]).insert(arc_ref);
 
         return;
     }
@@ -192,8 +192,8 @@ namespace ad { namespace td { namespace detail {
         }
 
         const auto r = std::accumulate(
-            std::cbegin(get_arc_set_originating_from_me(_vertex_set.at(from))),
-            std::cend(get_arc_set_originating_from_me(_vertex_set.at(from))),
+            std::cbegin(get_arc_set_originating_from(_vertex_set.at(from))),
+            std::cend(get_arc_set_originating_from(_vertex_set.at(from))),
             weight_type(0),
             [this, from, to](const weight_type acc, const auto& arc){
                 return acc + get_vertex_weight(arc) * this->sweep(from + 1, to); });
