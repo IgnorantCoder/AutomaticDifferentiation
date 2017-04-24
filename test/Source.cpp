@@ -118,12 +118,9 @@ struct test {
                 = call_option(v_x, v_t, v_k, v_s, v_r);
             const double price
                 = static_cast<double>(p);
-            const std::size_t j0 = 0;
-            const double delta = p(j0);
-            const std::size_t j1 = 1;
-            const double theta = p(j1);
-            const std::size_t j2 = 2;
-            const double vega = p(j2);
+            const double delta = p(0);
+            const double theta = p(1);
+            const double vega = p(2);
         }
     }
 };

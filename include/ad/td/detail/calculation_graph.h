@@ -9,6 +9,9 @@
 #include <type_traits>
 #include <vector>
 
+#include <functional>
+#include <memory>
+
 namespace ad { namespace td { namespace detail {
     template <typename W>
     class calculation_graph {
@@ -23,7 +26,7 @@ namespace ad { namespace td { namespace detail {
             vertex_index_type, //to
             weight_type
         >;
-        using arc_set = std::deque<arc_type>;
+        using arc_set = std::vector<arc_type>;
 
         struct comp_arc_ref {
             bool operator()(
@@ -144,7 +147,7 @@ namespace ad { namespace td { namespace detail {
     template<typename W>
     inline calculation_graph<W>::calculation_graph()
         : _counter(0), _arc_set(), _vertex_set()
-    {
+    {        
     }
 
     template<typename W>
@@ -183,7 +186,7 @@ namespace ad { namespace td { namespace detail {
         const auto arc_ref = std::cref(this->_arc_set.back());
 
         get_arc_set_originating_from(this->_vertex_set[from]).emplace_back(arc_ref);
-        get_arc_set_pointing_to(this->_vertex_set[to]).emplace_back(arc_ref);
+        //get_arc_set_pointing_to(this->_vertex_set[to]).emplace_back(arc_ref);
 
         return;
     }
