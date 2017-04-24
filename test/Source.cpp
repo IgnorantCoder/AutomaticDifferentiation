@@ -106,14 +106,14 @@ struct test {
 
     static void top_down_method(const std::size_t n)
     {
-        ad::td::detail::calculation_graph<double> tape;
-        const auto v_x = ad::td::variable<double, double>(double(x), tape);
-        const auto v_t = ad::td::variable<double, double>(double(t), tape);
-        const auto v_k = ad::td::variable<double, double>(double(k), tape);
-        const auto v_s = ad::td::variable<double, double>(double(s), tape);
-        const auto v_r = ad::td::variable<double, double>(double(r), tape);
-
         for (std::size_t i = 0; i < n; ++i) {
+            ad::td::detail::calculation_graph<double> tape;
+            const auto v_x = ad::td::variable<double, double>(double(x), tape);
+            const auto v_t = ad::td::variable<double, double>(double(t), tape);
+            const auto v_k = ad::td::variable<double, double>(double(k), tape);
+            const auto v_s = ad::td::variable<double, double>(double(s), tape);
+            const auto v_r = ad::td::variable<double, double>(double(r), tape);
+
             const auto p
                 = call_option(v_x, v_t, v_k, v_s, v_r);
             const double price
