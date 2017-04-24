@@ -141,7 +141,7 @@ namespace ad { namespace td { namespace detail {
 
     template<typename W>
     inline calculation_graph<W>::calculation_graph()
-        : _conter(0), _arc_set(), _vertex_set()
+        : _counter(0), _arc_set(), _vertex_set()
     {
     }
 
