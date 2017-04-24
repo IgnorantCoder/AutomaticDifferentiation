@@ -17,6 +17,9 @@ namespace ad { namespace td {
         variable(value_type&& f, tape_type& tape);
         variable(const value_type& f, tape_type& tape);
 
+        template <typename E>
+        variable(const variable_expression<E>& e);
+
     public:
         explicit operator value_type() const;
         derivative_value_type operator()(const index_type i) const;
@@ -45,6 +48,12 @@ namespace ad { namespace td {
         : _f(f), _id(tape.add_vertex()), _tape(tape)
     {
     }
+
+    template<typename V, typename D>
+    template <typename E>
+    inline variable<V, D>::variable(const variable_expression<E>& e)
+        : _f(e()._f), _id(e()._id), _tape(e()._tape)
+    {}
 
     template<typename V, typename D>
     inline variable<V, D>::operator typename variable<V, D>::value_type() const
