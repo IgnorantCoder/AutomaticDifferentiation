@@ -118,10 +118,13 @@ struct test {
                 = call_option(v_x, v_t, v_k, v_s, v_r);
             const double price
                 = static_cast<double>(p);
+            std::cout << "delta" << std::endl;
             const double delta
                 = p(0);
+            std::cout << "theta" << std::endl;
             const double theta
                 = p(1);
+            std::cout << "vega" << std::endl;
             const double vega
                 = p(3);
         }
