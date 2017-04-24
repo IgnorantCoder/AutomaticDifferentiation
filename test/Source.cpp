@@ -67,16 +67,16 @@ struct test {
         for (std::size_t i = 0; i < n; ++i) {
             const double h = 0.0001;
             const double price
-                = call_option(test::x, test::t, test::k, test::s, test::r);
+                = call_option(double(x), double(t), double(k), double(s), double(r));
             const double delta
-                = (call_option(test::x + h, test::t, test::k, test::s, test::r)
-                    - call_option(test::x - h, test::t, test::k, test::s, test::r)) / (2 * h);
+                = (call_option(double(x) + h, double(t), double(k), double(s), double(r))
+                    - call_option(double(x) - h, double(t), double(k), double(s), double(r))) / (2 * h);
             const double theta
-                = (call_option(test::x, test::t + h, test::k, test::s, test::r)
-                    - call_option(test::x, test::t - h, test::k, test::s, test::r)) / (2 * h);
+                = (call_option(double(x), t + h, double(k), double(s), double(r))
+                    - call_option(double(x), double(t) - h, double(k), double(s), double(r))) / (2 * h);
             const double vega
-                = (call_option(test::x, test::t, test::k, test::s + h, test::r)
-                    - call_option(test::x, test::t, test::k, test::s - h, test::r)) / (2 * h);
+                = (call_option(double(x), double(t), double(k), double(s) + h, double(r))
+                    - call_option(double(x), double(t), double(k), double(s) - h, double(r))) / (2 * h);
         }
     }
 
@@ -107,11 +107,11 @@ struct test {
     static void top_down_method(const std::size_t n)
     {
         ad::td::detail::calculation_graph<double> tape;
-        const auto v_x = ad::td::variable<double, double>(test::x, tape);
-        const auto v_t = ad::td::variable<double, double>(test::t, tape);
-        const auto v_k = ad::td::variable<double, double>(test::k, tape);
-        const auto v_s = ad::td::variable<double, double>(test::s, tape);
-        const auto v_r = ad::td::variable<double, double>(test::r, tape);
+        const auto v_x = ad::td::variable<double, double>(double(x), tape);
+        const auto v_t = ad::td::variable<double, double>(double(t), tape);
+        const auto v_k = ad::td::variable<double, double>(double(k), tape);
+        const auto v_s = ad::td::variable<double, double>(double(s), tape);
+        const auto v_r = ad::td::variable<double, double>(double(r), tape);
 
         for (std::size_t i = 0; i < n; ++i) {
             const auto p
