@@ -7,7 +7,7 @@
 #include <set>
 #include <tuple>
 #include <type_traits>
-#include <utility>
+#include <vector>
 
 namespace ad { namespace td { namespace detail {
     template <typename W>
@@ -23,7 +23,7 @@ namespace ad { namespace td { namespace detail {
             vertex_index_type, //to
             weight_type
         >;
-        using arc_set = std::deque<arc_type>;
+        using arc_set = std::vector<arc_type>;
 
         struct comp_arc_ref {
             bool operator()(
@@ -35,13 +35,14 @@ namespace ad { namespace td { namespace detail {
         };
 
         using arc_ref_set
-            = std::deque<std::reference_wrapper<const arc_type>>;
+            = std::vector<std::reference_wrapper<const arc_type>>;
         using vertex_type 
             = std::pair<
                 arc_ref_set,    //pointing to me
                 arc_ref_set     //originating from me
             >;
-        using vertex_set = std::map<vertex_index_type, vertex_type>;
+        //using vertex_set = std::map<vertex_index_type, vertex_type>;
+        using vertex_set = std::vector<vertex_type>;
 
     private:
         static vertex_index_type get_start_vertex(const arc_type& arc);
@@ -151,7 +152,8 @@ namespace ad { namespace td { namespace detail {
     calculation_graph<W>::add_vertex()
     {
         const auto n = this->get_new_index();
-        _vertex_set.emplace(n, vertex_type());
+        //_vertex_set.emplace(n, vertex_type());
+        _vertex_set.emplace_back(vertex_type());
 
         return n;
     }
@@ -174,8 +176,8 @@ namespace ad { namespace td { namespace detail {
         const vertex_index_type to, 
         const weight_type w)
     {
-        assert(_vertex_set.find(from) != _vertex_set.cend());
-        assert(_vertex_set.find(to) != _vertex_set.cend());
+        //assert(_vertex_set.find(from) != _vertex_set.cend());
+        //assert(_vertex_set.find(to) != _vertex_set.cend());
 
         this->_arc_set.emplace_back(from, to, w);
         const auto arc_ref = std::cref(this->_arc_set.back());
@@ -192,8 +194,8 @@ namespace ad { namespace td { namespace detail {
         const vertex_index_type from, 
         const vertex_index_type to) const
     {
-        assert(_vertex_set.find(from) != _vertex_set.cend());
-        assert(_vertex_set.find(to) != _vertex_set.cend());
+        //assert(_vertex_set.find(from) != _vertex_set.cend());
+        //assert(_vertex_set.find(to) != _vertex_set.cend());
 
         if (from > to) { //pruning
             return weight_type(0);
