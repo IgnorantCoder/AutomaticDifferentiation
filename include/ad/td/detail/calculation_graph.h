@@ -185,10 +185,17 @@ namespace ad { namespace td { namespace detail {
     {
         assert(_vertex_set.find(from) != _vertex_set.cend());
         assert(_vertex_set.find(to) != _vertex_set.cend());
-        assert(from <= to);
+
+        if (from > to) { //pruning
+            return weight_type(0);
+        }
 
         if (from == to) {
             return weight_type(1);
+        }
+
+        if (get_arc_set_originating_from(_vertex_set.at(from)).empty()) {
+            return weight_type(0);
         }
 
         const auto r = std::accumulate(
@@ -196,7 +203,9 @@ namespace ad { namespace td { namespace detail {
             std::cend(get_arc_set_originating_from(_vertex_set.at(from))),
             weight_type(0),
             [this, from, to](const weight_type acc, const auto& arc){
-                return acc + get_vertex_weight(arc) * this->sweep(from + 1, to); });
+                return acc 
+                    + get_vertex_weight(arc)
+                    * this->sweep(get_end_vertex(arc), to); });
 
         return r;
     }

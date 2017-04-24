@@ -3,17 +3,17 @@
 #include <type_traits>
 
 #include "ad/bu/variable_expression.h"
-#include "ad/bu/detail/binary_functor.h"
-#include "ad/bu/detail/derivative_functor.h"
+#include "ad/functor/binary_functor.h"
+#include "ad/functor/derivative_functor.h"
 
 namespace ad { namespace bu {
-        template <typename C, typename E, typename F>
+    template <typename C, typename E, typename F>
     class scalar_variable_binary
         : public variable_expression<scalar_variable_binary<C, E, F>> {
     private:
         using functor_type = F;
         using derivative_functor_type
-            = detail::derivative_functor<functor_type>;
+            = ad::functor::derivative_functor<functor_type>;
 
     public:
         using scalar_value_type = C;
@@ -73,11 +73,11 @@ namespace ad { namespace bu {                                                  \
         scalar_variable_binary<                                                \
             C,                                                                 \
             E,                                                                 \
-            detail::NAME##_functor<C, typename E::value_type>>>                \
+            ad::functor::NAME##_functor<C, typename E::value_type>>>                \
     operator OPERATOR(const C& c, const variable_expression<E>& e)             \
     {                                                                          \
         using functor_type                                                     \
-            = detail::NAME##_functor<C, typename E::value_type>;               \
+            = ad::functor::NAME##_functor<C, typename E::value_type>;               \
         return scalar_variable_binary<C, E, functor_type>(c, e());             \
     }                                                                          \
 }}

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <type_traits>
 
-namespace ad { namespace bu { namespace detail {
+namespace ad { namespace functor {
     template <typename T>
     struct negate_functor {
         using result_type = decltype(-std::declval<T>());
@@ -12,10 +12,10 @@ namespace ad { namespace bu { namespace detail {
             return -x;
         }
     };
-}}}
+}}
 
 #define DEFINE_UNARY_FUNCTOR_FOR_AD_BU(NAME)                                   \
-namespace ad { namespace bu { namespace detail {                               \
+namespace ad { namespace functor {                                             \
     template <typename T>                                                      \
     struct NAME##_functor {                                                    \
         using result_type = decltype(std::NAME(std::declval<T>()));            \
@@ -24,7 +24,7 @@ namespace ad { namespace bu { namespace detail {                               \
             return std::NAME(x);                                               \
         }                                                                      \
     };                                                                         \
-}}} 
+}} 
 
 DEFINE_UNARY_FUNCTOR_FOR_AD_BU(sin);
 DEFINE_UNARY_FUNCTOR_FOR_AD_BU(cos);

@@ -4,8 +4,8 @@
 #include <type_traits>
 
 #include "ad/bu/variable_expression.h"
-#include "ad/bu/detail/binary_functor.h"
-#include "ad/bu/detail/derivative_functor.h"
+#include "ad/functor/binary_functor.h"
+#include "ad/functor/derivative_functor.h"
 
 namespace ad { namespace bu { 
     template <typename E0, typename E1, typename F>
@@ -14,7 +14,7 @@ namespace ad { namespace bu {
     private:
         using functor_type = F;
         using derivative_functor_type
-            = detail::derivative_functor<functor_type>;
+            = ad::functor::derivative_functor<functor_type>;
 
     public:
         using value_type = typename functor_type::result_type;
@@ -78,7 +78,7 @@ namespace ad { namespace bu {                                                  \
     inline variable_variable_binary<                                           \
         E0,                                                                    \
         E1,                                                                    \
-        detail::NAME##_functor<                                                \
+        ad::functor::NAME##_functor<                                           \
             typename E0::value_type,                                           \
             typename E1::value_type>>                                          \
     operator OPERATOR(                                                         \
@@ -86,7 +86,7 @@ namespace ad { namespace bu {                                                  \
         const variable_expression<E1>& e1)                                     \
     {                                                                          \
         using functor_type                                                     \
-            = detail::NAME##_functor<                                          \
+            = ad::functor::NAME##_functor<                                     \
                 typename E0::value_type,                                       \
                 typename E1::value_type>;                                      \
         return variable_variable_binary<E0, E1, functor_type>(e0(), e1());     \

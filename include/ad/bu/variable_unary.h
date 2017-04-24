@@ -3,8 +3,8 @@
 #include <type_traits>
 
 #include "ad/bu/variable_expression.h"
-#include "ad/bu/detail/unary_functor.h"
-#include "ad/bu/detail/derivative_functor.h"
+#include "ad/functor/unary_functor.h"
+#include "ad/functor/derivative_functor.h"
 
 namespace ad { namespace bu {
     template <typename E, typename F>
@@ -13,7 +13,7 @@ namespace ad { namespace bu {
     private:
         using functor_type = F;
         using derivative_functor_type
-            = detail::derivative_functor<functor_type>;
+            = ad::functor::derivative_functor<functor_type>;
 
     public:
         using value_type = typename functor_type::result_type;
@@ -66,11 +66,11 @@ namespace ad { namespace bu {
     @details \f$-x\f$
     */
     template <typename E>
-    inline variable_unary<E, detail::negate_functor<typename E::value_type>>
+    inline variable_unary<E, ad::functor::negate_functor<typename E::value_type>>
     operator -(const variable_expression<E>& e)
     {
         using functor_type 
-            = detail::negate_functor<typename E::value_type>;
+            = ad::functor::negate_functor<typename E::value_type>;
         return variable_unary<E, functor_type>(e());
     }
 }}
@@ -78,11 +78,13 @@ namespace ad { namespace bu {
 #define DEFINE_SPECIFIC_VARIABLE_UNARY(NAME)                                   \
 namespace ad { namespace bu {                                                  \
     template <typename E>                                                      \
-    inline variable_unary<E, detail::NAME##_functor<typename E::value_type>>   \
+    inline variable_unary<                                                     \
+        E,                                                                     \
+        ad::functor::NAME##_functor<typename E::value_type>>                   \
     NAME(const variable_expression<E>& e)                                      \
     {                                                                          \
         using functor_type                                                     \
-            = detail::NAME##_functor<typename E::value_type>;                  \
+            = ad::functor::NAME##_functor<typename E::value_type>;             \
         return variable_unary<E, functor_type>(e());                           \
     }                                                                          \
 }}                                                                             \

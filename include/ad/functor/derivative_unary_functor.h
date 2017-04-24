@@ -3,10 +3,10 @@
 #include <cmath>
 #include <type_traits>
 
-#include "ad/bu/detail/unary_functor.h"
-#include "ad/bu/detail/derivative_functor.h"
+#include "ad/functor/unary_functor.h"
+#include "ad/functor/derivative_functor.h"
 
-namespace ad { namespace bu { namespace detail {
+namespace ad { namespace functor {
     template <typename T>
     struct derivative_functor<negate_functor<T>> {
         using result_type = T;
@@ -83,4 +83,4 @@ namespace ad { namespace bu { namespace detail {
             return std::exp(x);
         }
     };
-}}}
+}}

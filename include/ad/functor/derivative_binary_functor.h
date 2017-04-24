@@ -3,10 +3,10 @@
 #include <cmath>
 #include <type_traits>
 
-#include "ad/bu/detail/binary_functor.h"
-#include "ad/bu/detail/derivative_functor.h"
+#include "ad/functor/binary_functor.h"
+#include "ad/functor/derivative_functor.h"
 
-namespace ad { namespace bu { namespace detail {
+namespace ad { namespace functor {
     template <typename T0, typename T1>
     struct derivative_functor<plus_functor<T0, T1>> {
         using result0_type = T0;
@@ -72,4 +72,4 @@ namespace ad { namespace bu { namespace detail {
             return - x0 / (x1 * x1);
         }
     };
-}}}
+}}

@@ -1,57 +1,49 @@
 #pragma once
 
 #include "ad/td/variable.h"
+#include "ad/td/variable_expression.h"
+#include "ad/functor/binary_functor.h"
+#include "ad/functor/derivative_functor.h"
 
-namespace ad { namespace td {
-    template <typename V, typename D>
-    variable<V, D> operator +(
-        const variable<V, D>& e0,
-        const variable<V, D>& e1)
-    {
-        const auto x0 = static_cast<V>(e0);
-        const auto x1 = static_cast<V>(e1);
-        const auto y = e0.generate_and_link(x0 + x1, D(1));
-        e1.link(y, D(1));
+#define DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(OPERATOR, NAME)               \
+namespace ad { namespace td {                                                  \
+    template <typename E0, typename E1>                                        \
+    variable<                                                                  \
+        typename ad::functor::NAME##_functor<                                  \
+            typename E0::value_type,                                           \
+            typename E1::value_type                                            \
+        >::result_type,                                                        \
+        typename ad::functor::derivative_functor<                              \
+            ad::functor::NAME##_functor<                                       \
+                typename E0::value_type,                                       \
+                typename E1::value_type                                        \
+            >                                                                  \
+        >::result0_type                                                         \
+    > operator OPERATOR(                                                       \
+        const variable_expression<E0>& e0,                                     \
+        const variable_expression<E1>& e1)                                     \
+    {                                                                          \
+        using functor_type = ad::functor::NAME##_functor<                      \
+            typename E0::value_type,                                           \
+            typename E1::value_type                                            \
+        >;                                                                     \
+        using derivative_functor_type                                          \
+            = ad::functor::derivative_functor<functor_type>;                   \
+                                                                               \
+        const auto x0 = static_cast<typename E0::value_type>(e0());            \
+        const auto x1 = static_cast<typename E1::value_type>(e1());            \
+        const auto y = e0().generate_and_link(                                 \
+            functor_type::apply(x0, x1),                                       \
+            derivative_functor_type::apply0(x0, x1));                          \
+        e1().link(y, derivative_functor_type::apply1(x0, x1));                 \
+                                                                               \
+        return y;                                                              \
+    }                                                                          \
+} }
 
-        return y;
-    }
+DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(+, plus);
+DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(-, minus);
+DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(*, multiply);
+DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(/ , divide);
 
-    template <typename V, typename D>
-    variable<V, D> operator -(
-        const variable<V, D>& e0,
-        const variable<V, D>& e1)
-    {
-        const auto x0 = static_cast<V>(e0);
-        const auto x1 = static_cast<V>(e1);
-        const auto y = e0.generate_and_link(x0 - x1, D(1));
-        e1.link(y, D(-1));
-
-        return y;
-    }
-
-    template <typename V, typename D>
-    variable<V, D> operator *(
-        const variable<V, D>& e0,
-        const variable<V, D>& e1)
-    {
-        const auto x0 = static_cast<V>(e0);
-        const auto x1 = static_cast<V>(e1);
-        const auto y = e0.generate_and_link(x0 * x1, D(x1));
-        e1.link(y, D(x0));
-
-        return y;
-    }
-
-    template <typename V, typename D>
-    variable<V, D> operator /(
-        const variable<V, D>& e0,
-        const variable<V, D>& e1)
-    {
-        const auto x0 = static_cast<V>(e0);
-        const auto x1 = static_cast<V>(e1);
-        const auto y = e0.generate_and_link(x0 / x1, D(1) / x1);
-        e1.link(y, - x0 / (x1 * x1));
-
-        return y;
-    }
-}}
+#undef DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY

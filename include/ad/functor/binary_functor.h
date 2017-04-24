@@ -2,8 +2,8 @@
 
 #include <type_traits>
 
-#define DEFINE_BINARY_FUNCTOR_FOR_AD_BU(OPERATOR, NAME)                        \
-namespace ad { namespace bu { namespace detail {                               \
+#define DEFINE_BINARY_FUNCTOR_FOR_AD(OPERATOR, NAME)                        \
+namespace ad { namespace functor {                                             \
     template <typename T0, typename T1>                                        \
     struct NAME##_functor {                                                    \
         using result_type                                                      \
@@ -13,11 +13,11 @@ namespace ad { namespace bu { namespace detail {                               \
             return x0 OPERATOR x1;                                             \
         }                                                                      \
     };                                                                         \
-} } }
+} }
 
-DEFINE_BINARY_FUNCTOR_FOR_AD_BU(+, plus);
-DEFINE_BINARY_FUNCTOR_FOR_AD_BU(-, minus);
-DEFINE_BINARY_FUNCTOR_FOR_AD_BU(*, multiply);
-DEFINE_BINARY_FUNCTOR_FOR_AD_BU(/, divide);
+DEFINE_BINARY_FUNCTOR_FOR_AD(+, plus);
+DEFINE_BINARY_FUNCTOR_FOR_AD(-, minus);
+DEFINE_BINARY_FUNCTOR_FOR_AD(*, multiply);
+DEFINE_BINARY_FUNCTOR_FOR_AD(/, divide);
 
-#undef DEFINE_BINARY_FUNCTOR_FOR_AD_BU
+#undef DEFINE_BINARY_FUNCTOR_FOR_AD

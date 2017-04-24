@@ -1,14 +1,15 @@
 #pragma once
 
+#include "ad/td/variable_expression.h"
 #include "ad/td/detail/calculation_graph.h"
 
 namespace ad { namespace td {
     template <typename V, typename D>
-    class variable {
+    class variable : public variable_expression<variable<V, D>> {
     public:
         using value_type = V;
         using derivative_value_type = D;
-        using this_type = variable<value_type, derivative_value_type>;
+        using expression_type = variable<value_type, derivative_value_type>;
         using tape_type = detail::calculation_graph<derivative_value_type>;
         using index_type = typename tape_type::vertex_index_type;
         
@@ -17,9 +18,9 @@ namespace ad { namespace td {
         variable(const value_type& f, tape_type& tape);
 
     public:
-        operator value_type() const;
+        explicit operator value_type() const;
         derivative_value_type operator()(const index_type i) const;
-        variable<V, D> generate_and_link(
+        expression_type generate_and_link(
             const value_type& f,
             const derivative_value_type& df) const;
 
@@ -59,7 +60,7 @@ namespace ad { namespace td {
     }
 
     template<typename V, typename D>
-    inline typename variable<V, D>::this_type
+    inline typename variable<V, D>::expression_type
     variable<V, D>::generate_and_link(
         const value_type & f,
         const derivative_value_type & df) const
