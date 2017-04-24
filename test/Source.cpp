@@ -82,49 +82,49 @@ struct test {
 
     static void bottom_up_method(const std::size_t n)
     {
-        const auto mgr
-            = ad::bu::create_variable_manager(x, k, t, s, r);
-        const auto v_x = mgr.get_variable(x);
-        const auto v_t = mgr.get_variable(t);
-        const auto v_k = mgr.get_variable(k);
-        const auto v_s = mgr.get_variable(s);
-        const auto v_r = mgr.get_variable(r);
-        
-        for (std::size_t i = 0; i < n; ++i) {
-            const auto p
-                = call_option(v_x, v_t, v_k, v_s, v_r);
-            const double price
-                = static_cast<double>(p);
-            const double delta
-                = ad::bu::d(p).d(x);
-            const double theta
-                = ad::bu::d(p).d(t);
-            const double vega
-                = ad::bu::d(p).d(s);
-        }
-    }
-
-    static void top_down_method(const std::size_t n)
-    {
-        //ad::td::detail::calculation_graph<double> tape;
-        //const auto v_x = ad::td::variable<double, double>(x, tape);
-        //const auto v_t = ad::td::variable<double, double>(t, tape);
-        //const auto v_k = ad::td::variable<double, double>(k, tape);
-        //const auto v_s = ad::td::variable<double, double>(s, tape);
-        //const auto v_r = ad::td::variable<double, double>(r, tape);
-
+        //const auto mgr
+        //    = ad::bu::create_variable_manager(x, k, t, s, r);
+        //const auto v_x = mgr.get_variable(x);
+        //const auto v_t = mgr.get_variable(t);
+        //const auto v_k = mgr.get_variable(k);
+        //const auto v_s = mgr.get_variable(s);
+        //const auto v_r = mgr.get_variable(r);
+        //
         //for (std::size_t i = 0; i < n; ++i) {
         //    const auto p
         //        = call_option(v_x, v_t, v_k, v_s, v_r);
         //    const double price
         //        = static_cast<double>(p);
         //    const double delta
-        //        = p(0);
+        //        = ad::bu::d(p).d(x);
         //    const double theta
-        //        = p(1);
+        //        = ad::bu::d(p).d(t);
         //    const double vega
-        //        = p(3);
+        //        = ad::bu::d(p).d(s);
         //}
+    }
+
+    static void top_down_method(const std::size_t n)
+    {
+        ad::td::detail::calculation_graph<double> tape;
+        const auto v_x = ad::td::variable<double, double>(x, tape);
+        const auto v_t = ad::td::variable<double, double>(t, tape);
+        const auto v_k = ad::td::variable<double, double>(k, tape);
+        const auto v_s = ad::td::variable<double, double>(s, tape);
+        const auto v_r = ad::td::variable<double, double>(r, tape);
+
+        for (std::size_t i = 0; i < n; ++i) {
+            const auto p
+                = call_option(v_x, v_t, v_k, v_s, v_r);
+            const double price
+                = static_cast<double>(p);
+            const double delta
+                = p(0);
+            const double theta
+                = p(1);
+            const double vega
+                = p(3);
+        }
     }
 };
 
