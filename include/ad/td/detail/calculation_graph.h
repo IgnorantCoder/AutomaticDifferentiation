@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <numeric>
 #include <cassert>
 #include <map>
@@ -184,8 +185,12 @@ namespace ad { namespace td { namespace detail {
         const vertex_index_type from, 
         const vertex_index_type to) const
     {
-        //assert(_vertex_set.find(from) != _vertex_set.cend());
-        //assert(_vertex_set.find(to) != _vertex_set.cend());
+        if (_vertex_set.find(from) == _vertex_set.cend()) {
+            std::cout << from << "," << to << std::endl;
+        }
+
+        assert(_vertex_set.find(from) != _vertex_set.cend());
+        assert(_vertex_set.find(to) != _vertex_set.cend());
 
         if (from > to) { //pruning
             return weight_type(0);
