@@ -1,5 +1,6 @@
 #pragma once
 
+#include <deque>
 #include <numeric>
 #include <cassert>
 #include <map>
@@ -22,7 +23,7 @@ namespace ad { namespace td { namespace detail {
             vertex_index_type, //to
             weight_type
         >;
-        using arc_set = std::set<arc_type>;
+        using arc_set = std::deque<arc_type>;
 
         struct comp_arc_ref {
             bool operator()(
@@ -34,7 +35,7 @@ namespace ad { namespace td { namespace detail {
         };
 
         using arc_ref_set
-            = std::set<std::reference_wrapper<const arc_type>, comp_arc_ref>;
+            = std::deque<std::reference_wrapper<const arc_type>>;
         using vertex_type 
             = std::pair<
                 arc_ref_set,    //pointing to me
@@ -176,11 +177,11 @@ namespace ad { namespace td { namespace detail {
         assert(_vertex_set.find(from) != _vertex_set.cend());
         assert(_vertex_set.find(to) != _vertex_set.cend());
 
-        const auto it = this->_arc_set.emplace(from, to, w);
-        const auto arc_ref = std::cref(*it.first);
+        this->_arc_set.emplace_back(from, to, w);
+        const auto arc_ref = std::cref(this->_arc_set.back());
 
-        get_arc_set_originating_from(this->_vertex_set[from]).insert(arc_ref);
-        get_arc_set_pointing_to(this->_vertex_set[to]).insert(arc_ref);
+        get_arc_set_originating_from(this->_vertex_set[from]).emplace_back(arc_ref);
+        get_arc_set_pointing_to(this->_vertex_set[to]).emplace_back(arc_ref);
 
         return;
     }
