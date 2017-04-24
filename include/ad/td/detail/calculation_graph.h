@@ -52,6 +52,7 @@ namespace ad { namespace td { namespace detail {
         static const arc_ref_set& get_arc_set_originating_from(const vertex_type& vertex);
 
     public:
+        calculation_graph();
         vertex_index_type add_vertex();
         vertex_index_type add_vertex(
             const vertex_index_type from,
@@ -136,6 +137,12 @@ namespace ad { namespace td { namespace detail {
     calculation_graph<W>::get_arc_set_originating_from(const vertex_type& vertex)
     {
         return get_arc_set_originating_from(*const_cast<vertex_type*>(&vertex));
+    }
+
+    template<typename W>
+    inline calculation_graph<W>::calculation_graph()
+        : _conter(0), _arc_set(), _vertex_set()
+    {
     }
 
     template<typename W>
