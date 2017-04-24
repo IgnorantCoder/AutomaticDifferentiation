@@ -16,6 +16,7 @@ namespace ad { namespace td { namespace detail {
         using weight_type = W;
 
     private:
+        using this_type = calculation_graph;
         using arc_type = std::tuple<
             vertex_index_type, //from 
             vertex_index_type, //to
@@ -204,8 +205,8 @@ namespace ad { namespace td { namespace detail {
             weight_type(0),
             [this, from, to](const weight_type acc, const auto& arc){
                 return acc 
-                    + get_vertex_weight(arc)
-                    * this->sweep(get_end_vertex(arc), to); });
+                    + this_type::get_vertex_weight(arc)
+                    * this->sweep(this_type::get_end_vertex(arc), to); });
 
         return r;
     }
