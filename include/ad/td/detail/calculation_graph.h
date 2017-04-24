@@ -23,7 +23,7 @@ namespace ad { namespace td { namespace detail {
             vertex_index_type, //to
             weight_type
         >;
-        using arc_set = std::vector<arc_type>;
+        using arc_set = std::deque<arc_type>;
 
         struct comp_arc_ref {
             bool operator()(
