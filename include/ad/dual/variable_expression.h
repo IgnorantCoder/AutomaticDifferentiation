@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace ad { namespace bu {
+namespace ad { namespace dual {
     template <typename E>
     class variable_expression {
     public:

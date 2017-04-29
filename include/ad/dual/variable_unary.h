@@ -2,11 +2,11 @@
 
 #include <type_traits>
 
-#include "ad/bu/variable_expression.h"
+#include "ad/dual/variable_expression.h"
 #include "ad/functor/unary_functor.h"
 #include "ad/functor/derivative_functor.h"
 
-namespace ad { namespace bu {
+namespace ad { namespace dual {
     template <typename E, typename F>
     class variable_unary
         : public variable_expression<variable_unary<E, F>> {
@@ -76,7 +76,7 @@ namespace ad { namespace bu {
 }}
 
 #define DEFINE_SPECIFIC_VARIABLE_UNARY(NAME)                                   \
-namespace ad { namespace bu {                                                  \
+namespace ad { namespace dual {                                                  \
     template <typename E>                                                      \
     inline variable_unary<                                                     \
         E,                                                                     \
@@ -89,7 +89,7 @@ namespace ad { namespace bu {                                                  \
     }                                                                          \
 }}                                                                             \
 namespace std {                                                                \
-    using ad::bu::NAME;                                                        \
+    using ad::dual::NAME;                                                        \
 }
 
 DEFINE_SPECIFIC_VARIABLE_UNARY(sqrt);

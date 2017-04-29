@@ -2,10 +2,10 @@
 
 #include <type_traits>
 
-#include "ad/bu/variable.h"
-#include "ad/bu/variable_expression.h"
+#include "ad/dual/variable.h"
+#include "ad/dual/variable_expression.h"
 
-namespace ad { namespace bu {
+namespace ad { namespace dual {
     /**
     @note Please do not use for rvalue generation. It causes a runtime error.
     */
