@@ -2,14 +2,14 @@
 
 #include <type_traits>
 
-#include "ad/bu/variable_expression.h"
+#include "ad/dual/variable_expression.h"
 #include "ad/functor/binary_functor.h"
 #include "ad/functor/derivative_functor.h"
 
-namespace ad { namespace bu {
+namespace ad { namespace dual {
     template <typename C, typename E, typename F>
-    class variable_scalar_binary
-        : public variable_expression<variable_scalar_binary<C, E, F>> {
+    class scalar_variable_binary
+        : public variable_expression<scalar_variable_binary<C, E, F>> {
     private:
         using functor_type = F;
         using derivative_functor_type
@@ -19,11 +19,11 @@ namespace ad { namespace bu {
         using scalar_value_type = C;
         using value_type = typename functor_type::result_type;
         using derivative_value_type = typename E::derivative_value_type;
-        using closure_type = variable_scalar_binary<C, E, F>;
+        using closure_type = scalar_variable_binary<C, E, F>;
         using index_map_type = typename E::index_map_type;
 
     public:
-        variable_scalar_binary(const C& c, const E& e);
+        scalar_variable_binary(const C& c, const E& e);
 
     public:
         operator value_type() const;
@@ -36,7 +36,7 @@ namespace ad { namespace bu {
     };
 
     template<typename C, typename E, typename F>
-    inline variable_scalar_binary<C, E, F>::variable_scalar_binary(
+    inline scalar_variable_binary<C, E, F>::scalar_variable_binary(
         const C & c,
         const E & e)
         : _c(c), _e(e)
@@ -44,47 +44,47 @@ namespace ad { namespace bu {
     }
 
     template<typename C, typename E, typename F>
-    inline variable_scalar_binary<C, E, F>::operator
-    typename variable_scalar_binary<C, E, F>::value_type() const
+    inline scalar_variable_binary<C, E, F>::operator 
+    typename scalar_variable_binary<C, E, F>::value_type() const
     {
-        return functor_type::apply(_e, _c);
+        return functor_type::apply(_c, _e);
     }
 
     template<typename C, typename E, typename F>
-    inline typename variable_scalar_binary<C, E, F>::derivative_value_type
-    variable_scalar_binary<C, E, F>::operator()(const std::size_t i) const
+    inline typename scalar_variable_binary<C, E, F>::derivative_value_type
+    scalar_variable_binary<C, E, F>::operator()(const std::size_t i) const
     {
-        return _e(i) * derivative_functor_type::apply0(_e, _c);
+        return _e(i) * derivative_functor_type::apply1(_c, _e);
     }
 
     template<typename C, typename E, typename F>
-    inline const typename variable_scalar_binary<C, E, F>::index_map_type&
-    variable_scalar_binary<C, E, F>::index_mapper() const
+    inline const typename scalar_variable_binary<C, E, F>::index_map_type&
+    scalar_variable_binary<C, E, F>::index_mapper() const
     {
         return _e.index_mapper();
     }
 }}
 
-#define DEFINE_SPECIFIC_VARIABLE_SCALAR_BINARY(OPERATOR, NAME)                 \
-namespace ad { namespace bu {                                                  \
+#define DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(OPERATOR, NAME)                 \
+namespace ad { namespace dual {                                                  \
     template <typename C, typename E> inline                                   \
     std::enable_if_t<                                                          \
         !is_variable_expression<C>::value,                                     \
-        variable_scalar_binary<                                                \
+        scalar_variable_binary<                                                \
             C,                                                                 \
             E,                                                                 \
-        ad::functor::NAME##_functor<typename E::value_type, C>>>               \
-    operator OPERATOR(const variable_expression<E>& e, const C& c)             \
+            ad::functor::NAME##_functor<C, typename E::value_type>>>                \
+    operator OPERATOR(const C& c, const variable_expression<E>& e)             \
     {                                                                          \
         using functor_type                                                     \
-            = ad::functor::NAME##_functor<typename E::value_type, C>;          \
-        return variable_scalar_binary<C, E, functor_type>(c, e());             \
+            = ad::functor::NAME##_functor<C, typename E::value_type>;               \
+        return scalar_variable_binary<C, E, functor_type>(c, e());             \
     }                                                                          \
 }}
 
-DEFINE_SPECIFIC_VARIABLE_SCALAR_BINARY(+, plus);
-DEFINE_SPECIFIC_VARIABLE_SCALAR_BINARY(-, minus);
-DEFINE_SPECIFIC_VARIABLE_SCALAR_BINARY(*, multiply);
-DEFINE_SPECIFIC_VARIABLE_SCALAR_BINARY(/, divide);
+DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(+, plus);
+DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(-, minus);
+DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(*, multiply);
+DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(/, divide);
 
-#undef DEFINE_SPECIFIC_VARIABLE_SCALAR_BINARY
+#undef DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY

@@ -3,10 +3,10 @@
 #include <map>
 
 #include "ad/type_traits/head.h"
-#include "ad/bu/variable.h"
-#include "ad/bu/detail/create_mapping.h"
+#include "ad/dual/variable.h"
+#include "ad/dual/detail/create_mapping.h"
 
-namespace ad { namespace bu {
+namespace ad { namespace dual {
     template <typename V>
     class variable_manager {
     public:

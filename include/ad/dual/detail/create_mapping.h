@@ -9,7 +9,7 @@
 
 #include "ad/type_traits/head.h"
 
-namespace ad { namespace bu { namespace detail {
+namespace ad { namespace dual { namespace detail {
     template <typename T>
     inline std::map<T const*, std::size_t>
     create_mapping(const std::vector<T const*>& d)

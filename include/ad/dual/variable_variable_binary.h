@@ -3,11 +3,11 @@
 #include <cassert>
 #include <type_traits>
 
-#include "ad/bu/variable_expression.h"
+#include "ad/dual/variable_expression.h"
 #include "ad/functor/binary_functor.h"
 #include "ad/functor/derivative_functor.h"
 
-namespace ad { namespace bu { 
+namespace ad { namespace dual { 
     template <typename E0, typename E1, typename F>
     class variable_variable_binary
         : public variable_expression<variable_variable_binary<E0, E1, F>> {
@@ -73,7 +73,7 @@ namespace ad { namespace bu {
 }}
 
 #define DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(OPERATOR, NAME)               \
-namespace ad { namespace bu {                                                  \
+namespace ad { namespace dual {                                                  \
     template <typename E0, typename E1>                                        \
     inline variable_variable_binary<                                           \
         E0,                                                                    \

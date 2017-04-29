@@ -1,45 +1,51 @@
 #pragma once
 
 #include "ad/bu/variable.h"
-#include "ad/bu/variable_expression.h"
 
 namespace ad { namespace bu {
-    template <typename E>
+    template <typename V, typename D>
     class derivative {
     public:
-        using variable_expression_type = typename E::expression_type;
-        using value_type = typename variable_expression_type::value_type;
+        using derivative_value_type = D;
 
     public:
-        derivative(const E& var);
+        derivative(const variable<V, D>& v);
 
     public:
-        value_type d(const value_type& x) const;
+        derivative_value_type d(const variable<V, D>& x) const;
+        derivative_value_type d(const V& x) const;
 
     private:
-        variable_expression_type _var;
+        const variable<V, D>& _v;
     };
 
-    template<typename E>
-    inline derivative<E>::derivative(const E& var)
-        : _var(var)
+    template<typename V, typename D>
+    inline derivative<V, D>::derivative(const variable<V, D>& v)
+        : _v(v)
     {
     }
 
-    template<typename E>
-    inline typename derivative<E>::value_type 
-    derivative<E>::d(const value_type& x) const
+    template<typename V, typename D>
+    inline typename derivative<V, D>::derivative_value_type
+    derivative<V, D>::d(const variable<V, D>& x) const
     {
-        const auto it
-            = _var.index_mapper().find(std::addressof(x));
-        return it == std::cend(_var.index_mapper())
-            ? value_type(0)
-            : _var(it->second);
+        return _v.get_tape().sweep(x.get_id(), _v.get_id());
     }
 
-    template<typename E>
-    derivative<E> d(const variable_expression<E>& v)
+    template<typename V, typename D>
+    inline typename derivative<V, D>::derivative_value_type
+    derivative<V, D>::d(const V & x) const
     {
-        return derivative<E>(v());
+        typename variable<V, D>::index_type i = 0;
+        if (!_v.try_get_index(i, std::addressof(x))) {
+            return derivative_value_type(0);
+        }
+        return _v.get_tape().sweep(i, _v.get_id());;
+    }
+
+    template <typename V, typename D>
+    derivative<V, D> d(const variable<V, D>& y)
+    {
+        return derivative<V, D>(y);
     }
 } }
