@@ -40,7 +40,7 @@ namespace ad { namespace tape {                                                 
     }                                                                           \
 } }                                                                             \
 namespace std {                                                                 \
-    using ad::tape::NAME;                                                             \
+    using ad::tape::NAME;                                                       \
 }
 
 DEFINE_SPECIFIC_VARIABLE_UNARY(sqrt);
