@@ -4,6 +4,34 @@
 #include "ad/bottom_up.h"
 #include "ad/top_down.h"
 
+namespace bp = boost::python;
+
+#ifdef _DEBUG
+#define DEFINE_PYTHON_SCOPE(METHOD)                                             \
+bp::object module(                                                              \
+    bp::handle<>(bp::borrowed(PyImport_AddModule("adpyd.##METHOD"))));          \
+bp::scope().attr(#METHOD) = module;                                             \
+bp::scope scope = module;
+#else
+#define DEFINE_PYTHON_SCOPE(METHOD)                                             \
+bp::object module(                                                              \
+    bp::handle<>(bp::borrowed(PyImport_AddModule("adpy.##METHOD"))));           \
+bp::scope().attr(#METHOD) = module;                                             \
+bp::scope scope = module;
+#endif
+
+#define DEFINE_VARIABLE_MANAGER(SHORT_METHOD, DEIRECTION)                       \
+using variable_manager                                                          \
+    = ad::tape::variable_manager<                                               \
+        double,                                                                 \
+        double,                                                                 \
+        ad::tape::##DEIRECTION##_calculation_graph>;                            \
+bp::class_<variable_manager>("VariableManager")                                 \
+    .def("to_variable", &variable_manager::to_variable);                        \
+bp::def(                                                                        \
+    "create_variable_manager",                                                  \
+    &ad::##SHORT_METHOD##::create_manager<double>);
+
 #define DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(OPERATOR)                           \
 .def(double() OPERATOR boost::python::self)                                     \
 .def(boost::python::self OPERATOR double())                                     \
@@ -12,94 +40,60 @@
 #define DEFINE_UNARY_FOR_OBJECT(NAME, DEIRECTION)                               \
 boost::python::def(                                                             \
     #NAME,                                                                      \
-    &ad::tape::NAME<double, double, ad::tape::##DEIRECTION##_calculation_graph>);
+    &ad::tape::##NAME<                                                          \
+        double,                                                                 \
+        double,                                                                 \
+        ad::tape::##DEIRECTION##_calculation_graph>);
 
-double bu_to_double(const ad::bu::variable<double, double>& v)
+#define DEFINE_VARIABLE(SHORT_METHOD, DEIRECTION)                               \
+using variable = ad::##SHORT_METHOD##::variable<double>;                        \
+bp::class_<variable>("Variable")                                                \
+    .def(-bp::self)                                                             \
+    DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(+)                                      \
+    DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(-)                                      \
+    DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(*)                                      \
+    DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(/);                                     \
+DEFINE_UNARY_FOR_OBJECT(sqrt, DEIRECTION);                                      \
+DEFINE_UNARY_FOR_OBJECT(sin, DEIRECTION);                                       \
+DEFINE_UNARY_FOR_OBJECT(cos, DEIRECTION);                                       \
+DEFINE_UNARY_FOR_OBJECT(tan, DEIRECTION);                                       \
+DEFINE_UNARY_FOR_OBJECT(log, DEIRECTION);                                       \
+DEFINE_UNARY_FOR_OBJECT(exp, DEIRECTION);                                       \
+DEFINE_UNARY_FOR_OBJECT(erf, DEIRECTION);                                       \
+bp::def("to_double", &::##DEIRECTION##_to_double);
+
+double forward_to_double(const ad::bu::variable<double, double>& v)
 {
     return static_cast<double>(v);
 }
-
-double td_to_double(const ad::td::variable<double, double>& v)
-{
-    return static_cast<double>(v);
-}
-
-namespace bp = boost::python;
 
 void export_bottomup() { 
-#ifdef _DEBUG
-    bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("adpyd.bottomup"))));
-#else
-    bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("adpy.bottomup"))));
-#endif
-    bp::scope().attr("bottomup") = module;
-    bp::scope scope0 = module;
+    DEFINE_PYTHON_SCOPE(bottomup)
 
-    using variable = ad::bu::variable<double>;
-    using variable_manager = ad::tape::variable_manager<double, double, ad::tape::forward_calculation_graph>;
-    using derivative = ad::bu::derivative<double, double>;
-
-    bp::class_<variable_manager>("VariableManager")
-        .def("to_variable", &variable_manager::to_variable);
-    bp::def(
-        "create_variable_manager",
-        &ad::bu::create_manager<double>);
+    DEFINE_VARIABLE_MANAGER(bu, forward);
+    DEFINE_VARIABLE(bu, forward);
     
-    bp::class_<variable>("Variable")
-        .def(-bp::self)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(+)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(-)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(*)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(/);
-    DEFINE_UNARY_FOR_OBJECT(sqrt, forward);
-    DEFINE_UNARY_FOR_OBJECT(sin, forward);
-    DEFINE_UNARY_FOR_OBJECT(cos, forward);
-    DEFINE_UNARY_FOR_OBJECT(tan, forward);
-    DEFINE_UNARY_FOR_OBJECT(log, forward);
-    DEFINE_UNARY_FOR_OBJECT(exp, forward);
-    DEFINE_UNARY_FOR_OBJECT(erf, forward);
-    bp::def("to_double", &::bu_to_double);
-    
+    using derivative
+        = ad::bu::derivative<double, double>;
     bp::class_<derivative>("Derivative", bp::init<variable>())
         .def("d", static_cast<double(derivative::*)(const variable&) const>(&derivative::d));
     bp::def("d", &ad::bu::d<double, double>);
 }
 
+double reverse_to_double(const ad::td::variable<double, double>& v)
+{
+    return static_cast<double>(v);
+}
+
 void export_topdown()
 {
-#ifdef _DEBUG
-    bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("adpyd.topdown"))));
-#else
-    bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("adpy.topdown"))));
-#endif
-    bp::scope().attr("topdown") = module;
-    bp::scope scope1 = module;
+    DEFINE_PYTHON_SCOPE(topdown)
 
-    using variable = ad::td::variable<double, double>;
-    using variable_manager = ad::tape::variable_manager<double, double, ad::tape::reverse_calculation_graph>;
-    using gradient = ad::td::gradient_holder<double, double>;
+    DEFINE_VARIABLE_MANAGER(td, reverse);
+    DEFINE_VARIABLE(td, reverse);
 
-    bp::class_<variable_manager>("VariableManager")
-        .def("to_variable", &variable_manager::to_variable);
-    bp::def(
-        "create_variable_manager",
-        &ad::td::create_manager<double>);
-
-    bp::class_<variable>("Variable")
-        .def(-bp::self)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(+)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(-)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(*)
-        DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(/ );
-    DEFINE_UNARY_FOR_OBJECT(sqrt, reverse);
-    DEFINE_UNARY_FOR_OBJECT(sin, reverse);
-    DEFINE_UNARY_FOR_OBJECT(cos, reverse);
-    DEFINE_UNARY_FOR_OBJECT(tan, reverse);
-    DEFINE_UNARY_FOR_OBJECT(log, reverse);
-    DEFINE_UNARY_FOR_OBJECT(exp, reverse);
-    DEFINE_UNARY_FOR_OBJECT(erf, reverse);
-    bp::def("to_double", &::td_to_double);
-
+    using gradient
+        = ad::td::gradient_holder<double, double>;
     bp::class_<gradient>("Gradient", bp::init<variable, typename gradient::gradient_data>())
         .def("in_direction_of", static_cast<double(gradient::*)(const variable&) const>(&gradient::in_direction_of));
     bp::def("gradient", &ad::td::gradient<double, double>);
