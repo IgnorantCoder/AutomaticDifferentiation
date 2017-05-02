@@ -12,6 +12,8 @@ namespace ad { namespace td {
         using gradient_data = std::vector<derivative_value_type>;
 
     public:
+        gradient_holder(gradient_holder&& other);
+        gradient_holder(const gradient_holder& other);
         gradient_holder(const variable<V, D>& v, gradient_data&& data);
         gradient_holder(const variable<V, D>& v, const gradient_data& data);
 
@@ -23,6 +25,18 @@ namespace ad { namespace td {
         const variable<V, D>& _v;
         gradient_data _data;
     };
+
+    template<typename V, typename D>
+    inline gradient_holder<V, D>::gradient_holder(gradient_holder&& other)
+        :_v(other._v),
+        _data(std::move(other._data))
+    {}
+
+    template<typename V, typename D>
+    inline gradient_holder<V, D>::gradient_holder(const gradient_holder& other)
+        : _v(other._v),
+        _data(other._data)
+    {}
 
     template<typename V, typename D>
     inline gradient_holder<V, D>::gradient_holder(

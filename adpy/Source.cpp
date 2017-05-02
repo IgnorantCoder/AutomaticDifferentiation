@@ -20,12 +20,11 @@ bp::scope().attr(#METHOD) = module;                                             
 bp::scope scope = module;
 #endif
 
-#define DEFINE_VARIABLE_MANAGER(SHORT_METHOD, DEIRECTION)                       \
+#define DEFINE_VARIABLE_MANAGER(SHORT_METHOD)                                   \
 using variable_manager                                                          \
-    = ad::tape::variable_manager<                                               \
+    = ad::##SHORT_METHOD##::variable_manager<                                   \
         double,                                                                 \
-        double,                                                                 \
-        ad::tape::##DEIRECTION##_calculation_graph>;                            \
+        double>;                                                                \
 bp::class_<variable_manager>("VariableManager")                                 \
     .def("to_variable", &variable_manager::to_variable);                        \
 bp::def(                                                                        \
@@ -70,7 +69,7 @@ double forward_to_double(const ad::bu::variable<double, double>& v)
 void export_bottomup() { 
     DEFINE_PYTHON_SCOPE(bottomup)
 
-    DEFINE_VARIABLE_MANAGER(bu, forward);
+    DEFINE_VARIABLE_MANAGER(bu);
     DEFINE_VARIABLE(bu, forward);
     
     using derivative
@@ -89,7 +88,7 @@ void export_topdown()
 {
     DEFINE_PYTHON_SCOPE(topdown)
 
-    DEFINE_VARIABLE_MANAGER(td, reverse);
+    DEFINE_VARIABLE_MANAGER(td);
     DEFINE_VARIABLE(td, reverse);
 
     using gradient
