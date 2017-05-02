@@ -17,6 +17,8 @@ namespace ad { namespace tape {
 
     public:
         variable_manager();
+        variable_manager(variable_manager<V, D, G>&& other);
+        variable_manager(const variable_manager<V, D, G>& other);
 
     public:
         variable_type to_variable(const value_type& x);
@@ -25,6 +27,22 @@ namespace ad { namespace tape {
         tape_type _tape;
         index_mapper_type _index_mapper;
     };
+
+    template <typename V, typename D, template <typename> typename G>
+    inline variable_manager<V, D, G>::variable_manager(
+        variable_manager<V, D, G>&& other)
+        : _tape(std::move(other._tape)),
+        _index_mapper(std::move(other._index_mapper))
+    {
+    }
+
+    template <typename V, typename D, template <typename> typename G>
+    inline variable_manager<V, D, G>::variable_manager(
+        const variable_manager<V, D, G>& other)
+        : _tape(other._tape),
+        _index_mapper(other._index_mapper)
+    {
+    }
 
     template <typename V, typename D, template <typename> typename G>
     inline variable_manager<V, D, G>::variable_manager()

@@ -28,6 +28,8 @@ namespace ad { namespace tape {
 
     public:
         reverse_calculation_graph();
+        reverse_calculation_graph(reverse_calculation_graph&& other);
+        reverse_calculation_graph(const reverse_calculation_graph& other);
 
     public:
         vertex_index_type add_vertex();
@@ -80,6 +82,20 @@ namespace ad { namespace tape {
     template<typename W>
     inline reverse_calculation_graph<W>::reverse_calculation_graph()
         : _vertex_set()
+    {
+    }
+
+    template<typename W>
+    inline reverse_calculation_graph<W>::reverse_calculation_graph(
+        reverse_calculation_graph<W>&& other)
+        : _vertex_set(std::move(other._vertex_set))
+    {
+    }
+
+    template<typename W>
+    inline reverse_calculation_graph<W>::reverse_calculation_graph(
+        const reverse_calculation_graph<W>& other)
+        : _vertex_set(other._vertex_set)
     {
     }
 

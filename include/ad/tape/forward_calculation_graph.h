@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <numeric>
 #include <vector>
@@ -26,6 +27,8 @@ namespace ad { namespace tape {
 
     public:
         forward_calculation_graph();
+        forward_calculation_graph(forward_calculation_graph&& other);
+        forward_calculation_graph(const forward_calculation_graph& other);
 
     public:
         vertex_index_type add_vertex();
@@ -77,6 +80,20 @@ namespace ad { namespace tape {
     template<typename W>
     inline forward_calculation_graph<W>::forward_calculation_graph()
         : _vertex_set()
+    {
+    }
+
+    template<typename W>
+    inline forward_calculation_graph<W>::forward_calculation_graph(
+        forward_calculation_graph<W>&& other)
+        : _vertex_set(std::move(other._vertex_set))
+    {
+    }
+
+    template<typename W>
+    inline forward_calculation_graph<W>::forward_calculation_graph(
+        const forward_calculation_graph<W>& other)
+        : _vertex_set(other._vertex_set)
     {
     }
 
