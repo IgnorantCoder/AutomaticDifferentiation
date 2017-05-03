@@ -3,9 +3,9 @@
 #include <map>
 #include <memory>
 
-#include "ad/tape/variable.h"
+#include "ad/rt/tape/variable.h"
 
-namespace ad { namespace tape {
+namespace ad { namespace rt { namespace tape {
     template <typename V, typename D, template <typename> typename G>
     class variable_manager {
     public:
@@ -58,4 +58,4 @@ namespace ad { namespace tape {
         _index_mapper.emplace(std::addressof(x), v.get_id());
         return v;
     }
-} }
+} } }

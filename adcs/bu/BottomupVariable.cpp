@@ -1,17 +1,17 @@
 #include "BottomupVariable.h"
 
 namespace Adcs { namespace Bu {
-    Variable::Variable(ad::bu::variable<double>&& native)
-        : _native(new ad::bu::variable<double>(std::move(native)))
+    Variable::Variable(ad::rt::bu::variable<double>&& native)
+        : _native(new ad::rt::bu::variable<double>(std::move(native)))
     {}
 
-    const ad::bu::variable<double>& Variable::get_native()
+    const ad::rt::bu::variable<double>& Variable::get_native()
     {
         return *_native;
     }
 
     Variable::Variable(Variable ^ other)
-        : _native(new ad::bu::variable<double>(*other->_native))
+        : _native(new ad::rt::bu::variable<double>(*other->_native))
     {
     }
 

@@ -1,14 +1,14 @@
 #pragma once
 #include <type_traits>
 
-#include "ad/tape/variable.h"
-#include "ad/tape/variable_expression.h"
+#include "ad/rt/tape/variable.h"
+#include "ad/rt/tape/variable_expression.h"
 #include "ad/functor/binary_functor.h"
 #include "ad/functor/derivative_functor.h"
 
 
 #define DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(OPERATOR, NAME)                  \
-namespace ad { namespace tape {                                                 \
+namespace ad { namespace rt { namespace tape {                                  \
     template <typename C, typename V, typename D, template<typename> typename G>\
     std::enable_if_t <                                                          \
         !is_variable_expression<C>::value,                                      \
@@ -30,7 +30,7 @@ namespace ad { namespace tape {                                                 
             derivative_functor_type::apply1(c, x));                             \
         return y;                                                               \
     }                                                                           \
-} }
+} } }
 
 DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(+, plus);
 DEFINE_SPECIFIC_SCALAR_VARIABLE_BINARY(-, minus);

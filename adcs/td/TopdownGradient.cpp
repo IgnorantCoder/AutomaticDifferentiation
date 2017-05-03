@@ -5,17 +5,17 @@
 namespace Adcs { namespace Td {
     Gradient^ Gradient::Generate(Variable ^ y)
     {
-        auto&& grad = ad::td::gradient(y->get_native());
+        auto&& grad = ad::rt::td::gradient(y->get_native());
         return gcnew Gradient(std::move(grad));
     }
 
-    Gradient::Gradient(ad::td::gradient_holder<double, double>&& native)
-        : _native(new ad::td::gradient_holder<double, double>(native))
+    Gradient::Gradient(ad::rt::td::gradient_holder<double, double>&& native)
+        : _native(new ad::rt::td::gradient_holder<double, double>(native))
     {
     }
 
     Gradient::Gradient(Gradient ^ other)
-        : _native(new ad::td::gradient_holder<double, double>(*other->_native))
+        : _native(new ad::rt::td::gradient_holder<double, double>(*other->_native))
     {
     }
 

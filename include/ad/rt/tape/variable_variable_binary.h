@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ad/tape/variable.h"
+#include "ad/rt/tape/variable.h"
 #include "ad/functor/binary_functor.h"
 #include "ad/functor/derivative_functor.h"
 
 #define DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(OPERATOR, NAME)                \
-namespace ad { namespace tape {                                                 \
+namespace ad { namespace rt { namespace tape {                                  \
     template <typename V, typename D, template<typename> typename G>            \
     variable<V, D, G> operator OPERATOR(                                        \
         const variable<V, D, G>& e0,                                            \
@@ -26,7 +26,7 @@ namespace ad { namespace tape {                                                 
         e1.link_from_this(y, derivative_functor_type::apply1(x0, x1));          \
         return y;                                                               \
     }                                                                           \
-} }
+} } }
 
 DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(+, plus);
 DEFINE_SPECIFIC_VARIABLE_VARIABLE_BINARY(-, minus);

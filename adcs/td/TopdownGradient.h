@@ -10,7 +10,7 @@ namespace Adcs { namespace Td {
         static Gradient^ Generate(Variable^ y);
 
     private:
-        Gradient(ad::td::gradient_holder<double, double>&& native);
+        Gradient(ad::rt::td::gradient_holder<double, double>&& native);
 
     public:
         Gradient(Gradient^ other);
@@ -21,6 +21,6 @@ namespace Adcs { namespace Td {
         double InDirectionOf(Variable^ x);
 
     private:
-        ad::td::gradient_holder<double, double> const* _native;
+        ad::rt::td::gradient_holder<double, double> const* _native;
     };
 } }

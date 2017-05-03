@@ -8,13 +8,13 @@ namespace Adcs { namespace Bu {
         return gcnew Derivative(y->get_native());
     }
 
-    Derivative::Derivative(const ad::bu::variable<double>& native)
-        : _native(new ad::bu::variable<double>(native))
+    Derivative::Derivative(const ad::rt::bu::variable<double>& native)
+        : _native(new ad::rt::bu::variable<double>(native))
     {
     }
 
     Derivative::Derivative(Derivative ^ other)
-        : _native(new ad::bu::variable<double>(*other->_native))
+        : _native(new ad::rt::bu::variable<double>(*other->_native))
     {
     }
 
@@ -31,6 +31,6 @@ namespace Adcs { namespace Bu {
 
     double Derivative::D(Variable ^ x)
     {
-        return ad::bu::d(*_native).d(x->get_native());
+        return ad::rt::bu::d(*_native).d(x->get_native());
     }
 }}

@@ -10,7 +10,7 @@ namespace Adcs { namespace Bu {
         static Derivative^ Create(Variable^ y);
 
     private:
-        Derivative(const ad::bu::variable<double>& native);
+        Derivative(const ad::rt::bu::variable<double>& native);
 
     public:
         Derivative(Derivative^ other);
@@ -21,6 +21,6 @@ namespace Adcs { namespace Bu {
         double D(Variable^ x);
 
     private:
-        ad::bu::variable<double> const* _native;
+        ad::rt::bu::variable<double> const* _native;
     };
 } }

@@ -2,7 +2,7 @@
 
 #include <map>
 
-namespace ad { namespace tape {
+namespace ad { namespace rt { namespace tape {
     template <typename V, typename D, template <typename> typename G>
     class variable {
     public:
@@ -134,4 +134,4 @@ namespace ad { namespace tape {
         }
         return false;
     }
-}}
+} } }

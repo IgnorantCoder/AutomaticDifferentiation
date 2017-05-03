@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ad/tape/variable.h"
+#include "ad/rt/tape/variable.h"
 #include "ad/functor/derivative_functor.h"
 #include "ad/functor/unary_functor.h"
 
-namespace ad { namespace tape {
+namespace ad { namespace rt { namespace tape {
     template <typename V, typename D, template<typename> typename G>
     inline variable<V, D, G> operator -(const variable<V, D, G>& e)
     {
@@ -19,13 +19,13 @@ namespace ad { namespace tape {
             derivative_functor_type::apply(x));
         return y;
     }
-} }
+} } }
 
 
 #define DEFINE_SPECIFIC_VARIABLE_UNARY(NAME)                                    \
-namespace ad { namespace tape {                                                 \
+namespace ad { namespace rt { namespace tape {                                  \
     template <typename V, typename D, template<typename> typename G>            \
-    inline variable<V, D, G> NAME(const variable<V, D, G>& e)                                \
+    inline variable<V, D, G> NAME(const variable<V, D, G>& e)                   \
     {                                                                           \
         using variable_type = variable<V, D, G>;                                \
         using functor_type                                                      \
@@ -38,9 +38,9 @@ namespace ad { namespace tape {                                                 
             derivative_functor_type::apply(x));                                 \
         return y;                                                               \
     }                                                                           \
-} }                                                                             \
+} } }                                                                           \
 namespace std {                                                                 \
-    using ad::tape::NAME;                                                       \
+    using ad::rt::tape::NAME;                                                       \
 }
 
 DEFINE_SPECIFIC_VARIABLE_UNARY(sqrt);

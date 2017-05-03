@@ -5,8 +5,8 @@
 namespace Adcs { namespace Bu {
     public ref class Variable {
     internal:
-        explicit Variable(ad::bu::variable<double>&& native);
-        const ad::bu::variable<double>& get_native();
+        explicit Variable(ad::rt::bu::variable<double>&& native);
+        const ad::rt::bu::variable<double>& get_native();
 
     public:
         Variable(Variable^ other);
@@ -32,6 +32,6 @@ namespace Adcs { namespace Bu {
         double ToDouble();
 
     private:
-        ad::bu::variable<double> const* _native;
+        ad::rt::bu::variable<double> const* _native;
     };
 }}

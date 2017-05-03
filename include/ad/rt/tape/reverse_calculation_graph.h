@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 
-namespace ad { namespace tape {
+namespace ad { namespace rt { namespace tape {
     template <typename W>
     class reverse_calculation_graph {
     public:
@@ -163,4 +163,4 @@ namespace ad { namespace tape {
             this->sweep(ret, this_type::get_start_of(arc));
         }
     }
-} }
+} } }

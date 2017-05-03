@@ -5,17 +5,17 @@
 namespace Adcs { namespace Td {
     VariableManager^ VariableManager::Create()
     {
-        return gcnew VariableManager(ad::td::variable_manager<double, double>());
+        return gcnew VariableManager(ad::rt::td::variable_manager<double, double>());
     }
 
     VariableManager::VariableManager(
-        ad::td::variable_manager<double, double>&& native)
-        : _native(new ad::td::variable_manager<double, double>(std::move(native)))
+        ad::rt::td::variable_manager<double, double>&& native)
+        : _native(new ad::rt::td::variable_manager<double, double>(std::move(native)))
     {
     }
 
     VariableManager::VariableManager(VariableManager^ other)
-        : _native(new ad::td::variable_manager<double, double>(*other->_native))
+        : _native(new ad::rt::td::variable_manager<double, double>(*other->_native))
     {
 
     }

@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "ad/td/variable.h"
+#include "ad/rt/td/variable.h"
 
-namespace ad { namespace td {
+namespace ad { namespace rt { namespace td {
     template <typename V, typename D>
     class gradient_holder {
     public:
@@ -79,4 +79,4 @@ namespace ad { namespace td {
     {
         return gradient_holder<V, D>(y, y.get_tape().sweep(y.get_id()));
     }
-} }
+} } }

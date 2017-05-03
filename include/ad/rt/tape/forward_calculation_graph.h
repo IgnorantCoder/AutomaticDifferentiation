@@ -5,7 +5,7 @@
 #include <numeric>
 #include <vector>
 
-namespace ad { namespace tape {
+namespace ad { namespace rt { namespace tape {
     template <typename W>
     class forward_calculation_graph {
     public:
@@ -172,4 +172,4 @@ namespace ad { namespace tape {
         return ret;
     }
 
-} }
+} } }

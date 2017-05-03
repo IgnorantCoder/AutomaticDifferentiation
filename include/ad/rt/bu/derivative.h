@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ad/bu/variable.h"
+#include "ad/rt/bu/variable.h"
 
-namespace ad { namespace bu {
+namespace ad { namespace rt { namespace bu {
     template <typename V, typename D>
     class derivative {
     public:
@@ -48,4 +48,4 @@ namespace ad { namespace bu {
     {
         return derivative<V, D>(y);
     }
-} }
+} } }

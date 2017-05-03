@@ -154,7 +154,7 @@ inline void test::dual_method(const std::size_t n)
 inline void test::bottom_up_method(const std::size_t n)
 {
     for (std::size_t i = 0; i < n; ++i) {
-        auto mgr = ad::bu::create_manager<double>();
+        auto mgr = ad::rt::bu::create_manager<double>();
         const auto v_x = mgr.to_variable(x);
         const auto v_t = mgr.to_variable(t);
         const auto v_k = mgr.to_variable(k);
@@ -165,16 +165,16 @@ inline void test::bottom_up_method(const std::size_t n)
             = call_option(v_x, v_t, v_k, v_s, v_r);
         const double price
             = static_cast<double>(p);
-        const double delta = ad::bu::d(p).d(x);
-        const double theta = ad::bu::d(p).d(t);
-        const double vega = ad::bu::d(p).d(s);
+        const double delta = ad::rt::bu::d(p).d(x);
+        const double theta = ad::rt::bu::d(p).d(t);
+        const double vega = ad::rt::bu::d(p).d(s);
     }
 }
 
 inline void test::top_down_method(const std::size_t n)
 {
     for (std::size_t i = 0; i < n; ++i) {
-        auto mgr = ad::td::create_manager<double>();
+        auto mgr = ad::rt::td::create_manager<double>();
         const auto v_x = mgr.to_variable(x);
         const auto v_t = mgr.to_variable(t);
         const auto v_k = mgr.to_variable(k);
@@ -185,7 +185,7 @@ inline void test::top_down_method(const std::size_t n)
             = call_option(v_x, v_t, v_k, v_s, v_r);
         const double price
             = static_cast<double>(p);
-        const auto gradient = ad::td::gradient(p);
+        const auto gradient = ad::rt::td::gradient(p);
         const double delta = gradient.in_direction_of(v_x);
         const double theta = gradient.in_direction_of(v_t);
         const double vega = gradient.in_direction_of(v_s);

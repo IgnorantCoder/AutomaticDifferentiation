@@ -27,14 +27,14 @@ bp::scope scope = module;
 
 #define DEFINE_VARIABLE_MANAGER(SHORTMETHOD)                                    \
 using variable_manager                                                          \
-    = ad::##SHORTMETHOD##::variable_manager<                                    \
+    = ad::rt::##SHORTMETHOD##::variable_manager<                                    \
         double,                                                                 \
         double>;                                                                \
 bp::class_<variable_manager>("VariableManager")                                 \
     .def("to_variable", &variable_manager::to_variable);                        \
 bp::def(                                                                        \
     "create_variable_manager",                                                  \
-    &ad::##SHORTMETHOD##::create_manager<double>);
+    &ad::rt::##SHORTMETHOD##::create_manager<double>);
 
 #define DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(OPERATOR)                           \
 .def(double() OPERATOR boost::python::self)                                     \
@@ -44,13 +44,13 @@ bp::def(                                                                        
 #define DEFINE_UNARY_FOR_OBJECT(NAME, DEIRECTION)                               \
 boost::python::def(                                                             \
     #NAME,                                                                      \
-    &ad::tape::##NAME<                                                          \
+    &ad::rt::tape::##NAME<                                                          \
         double,                                                                 \
         double,                                                                 \
-        ad::tape::##DEIRECTION##_calculation_graph>);
+        ad::rt::tape::##DEIRECTION##_calculation_graph>);
 
 #define DEFINE_VARIABLE(SHORTMETHOD, DEIRECTION)                                \
-using variable = ad::##SHORTMETHOD##::variable<double>;                         \
+using variable = ad::rt::##SHORTMETHOD##::variable<double>;                         \
 bp::class_<variable>("Variable")                                                \
     .def(-bp::self)                                                             \
     DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(+)                                      \
@@ -66,7 +66,7 @@ DEFINE_UNARY_FOR_OBJECT(exp, DEIRECTION);                                       
 DEFINE_UNARY_FOR_OBJECT(erf, DEIRECTION);                                       \
 bp::def("to_double", &::##DEIRECTION##_to_double);
 
-double forward_to_double(const ad::bu::variable<double, double>& v)
+double forward_to_double(const ad::rt::bu::variable<double, double>& v)
 {
     return static_cast<double>(v);
 }
@@ -78,13 +78,13 @@ void export_bottomup() {
     DEFINE_VARIABLE(bu, forward);
     
     using derivative
-        = ad::bu::derivative<double, double>;
+        = ad::rt::bu::derivative<double, double>;
     bp::class_<derivative>("Derivative", bp::init<variable>())
         .def("d", static_cast<double(derivative::*)(const variable&) const>(&derivative::d));
-    bp::def("d", &ad::bu::d<double, double>);
+    bp::def("d", &ad::rt::bu::d<double, double>);
 }
 
-double reverse_to_double(const ad::td::variable<double, double>& v)
+double reverse_to_double(const ad::rt::td::variable<double, double>& v)
 {
     return static_cast<double>(v);
 }
@@ -97,10 +97,10 @@ void export_topdown()
     DEFINE_VARIABLE(td, reverse);
 
     using gradient
-        = ad::td::gradient_holder<double, double>;
+        = ad::rt::td::gradient_holder<double, double>;
     bp::class_<gradient>("Gradient", bp::init<variable, typename gradient::gradient_data>())
         .def("in_direction_of", static_cast<double(gradient::*)(const variable&) const>(&gradient::in_direction_of));
-    bp::def("gradient", &ad::td::gradient<double, double>);
+    bp::def("gradient", &ad::rt::td::gradient<double, double>);
 }
 
 #ifdef _DEBUG

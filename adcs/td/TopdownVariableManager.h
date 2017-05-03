@@ -10,7 +10,7 @@ namespace Adcs { namespace Td {
         static VariableManager^ Create();
 
     private:
-        VariableManager(ad::td::variable_manager<double, double>&& native);
+        VariableManager(ad::rt::td::variable_manager<double, double>&& native);
 
     public:
         VariableManager(VariableManager^ other);
@@ -21,6 +21,6 @@ namespace Adcs { namespace Td {
         Variable^ ToVariable(const double v);
 
     private:
-        ad::td::variable_manager<double, double>* _native;
+        ad::rt::td::variable_manager<double, double>* _native;
     };
 }}
