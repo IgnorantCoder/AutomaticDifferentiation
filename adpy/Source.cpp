@@ -6,30 +6,35 @@
 
 namespace bp = boost::python;
 
+#define DOULE_QUOTE_IMPL(X) #X
+#define DOULE_QUOTE(X) DOULE_QUOTE_IMPL(X)
+
 #ifdef _DEBUG
 #define DEFINE_PYTHON_SCOPE(METHOD)                                             \
 bp::object module(                                                              \
-    bp::handle<>(bp::borrowed(PyImport_AddModule("adpyd.##METHOD"))));          \
+    bp::handle<>(bp::borrowed(                                                  \
+        PyImport_AddModule(DOULE_QUOTE(adpyd.##METHOD)))));                     \
 bp::scope().attr(#METHOD) = module;                                             \
 bp::scope scope = module;
 #else
 #define DEFINE_PYTHON_SCOPE(METHOD)                                             \
 bp::object module(                                                              \
-    bp::handle<>(bp::borrowed(PyImport_AddModule("adpy.##METHOD"))));           \
+    bp::handle<>(bp::borrowed(                                                  \
+        PyImport_AddModule(DOULE_QUOTE(adpy.##METHOD)))));                      \
 bp::scope().attr(#METHOD) = module;                                             \
 bp::scope scope = module;
 #endif
 
-#define DEFINE_VARIABLE_MANAGER(SHORT_METHOD)                                   \
+#define DEFINE_VARIABLE_MANAGER(SHORTMETHOD)                                    \
 using variable_manager                                                          \
-    = ad::##SHORT_METHOD##::variable_manager<                                   \
+    = ad::##SHORTMETHOD##::variable_manager<                                    \
         double,                                                                 \
         double>;                                                                \
 bp::class_<variable_manager>("VariableManager")                                 \
     .def("to_variable", &variable_manager::to_variable);                        \
 bp::def(                                                                        \
     "create_variable_manager",                                                  \
-    &ad::##SHORT_METHOD##::create_manager<double>);
+    &ad::##SHORTMETHOD##::create_manager<double>);
 
 #define DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(OPERATOR)                           \
 .def(double() OPERATOR boost::python::self)                                     \
@@ -44,8 +49,8 @@ boost::python::def(                                                             
         double,                                                                 \
         ad::tape::##DEIRECTION##_calculation_graph>);
 
-#define DEFINE_VARIABLE(SHORT_METHOD, DEIRECTION)                               \
-using variable = ad::##SHORT_METHOD##::variable<double>;                        \
+#define DEFINE_VARIABLE(SHORTMETHOD, DEIRECTION)                                \
+using variable = ad::##SHORTMETHOD##::variable<double>;                         \
 bp::class_<variable>("Variable")                                                \
     .def(-bp::self)                                                             \
     DEFINE_BINARY_FOR_OBJECT_AND_DOUBLE(+)                                      \
